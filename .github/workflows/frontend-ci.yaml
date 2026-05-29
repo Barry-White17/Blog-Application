@@ -1,51 +1,28 @@
-name: Build-Frontend CI
-
-# on keyword listens to events
-# CI and CD are structured such that they operate based on another event handler, and this handler waits for requests to main branch
+name: Blog Frontend CI
 on:
-    push:
-        branches: 
-            - main
-
-    pull_request:
-        branches: 
-            - main
-
-# Define jobs that will run linter and build frontend, linter for reporting syntax errors
-# jobs that run linter probably have nothing to do with event handler, explaining why they are placed at different indentation levels
-
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 jobs:
-    lint-and-build:
-        # runs job on ubuntu container
-        runs-on: ubuntu-latest
+  lint-and-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x, 20.x]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm install
+      - name: Run linter on frontend
+        run: npm run lint
+      - name: Build frontend
+        run: npm run build
 
-        # Using matrix strategy to run tests, whatsoever matrix strategy refers to
-        # Matrix strategy is for running tests multiple times, with different variables
-        # This matrix strategy could help as far as catching version specific bugs is concerned
-
-        strategy:
-            matrix:
-                node-version: [16.x, 18.x, 20.x]
-
-        # Defining steps inside job
-        steps:
-            # Use actions/checkout, which checks out the steps in the repository
-            - uses: actions/checkout@v3
-
-            # Then utilize actions/setup-node which set's up node in our container based on node_version variable defined earlier
-            - name: Use node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v3
-              with:
-                  node-version: ${{ matrix.node-version }}
-
-                # Package manager for caching dependencies
-                 cache: 'npm'
-
-            - name: Install Depencencies
-              run: npm install
-
-            - name: Run Linter on frontend
-              run: npm run lint
-
-            - name: Build frontend
-              run: npm run build
