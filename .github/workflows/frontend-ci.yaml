@@ -4,10 +4,12 @@ name: Build-Frontend CI
 # CI and CD are structured such that they operate based on another event handler, and this handler waits for requests to main branch
 on:
     push:
-        branches: main
+        branches: 
+            - main
 
     pull_request:
-        branches: main
+        branches: 
+            - main
 
 # Define jobs that will run linter and build frontend, linter for reporting syntax errors
 # jobs that run linter probably have nothing to do with event handler, explaining why they are placed at different indentation levels
@@ -34,7 +36,7 @@ jobs:
             - name: Uses node.js ${{ matrix.node_version }}
               uses: actions/setup-node@v3
               with:
-                  node_version: ${ { matrix.node_version } }
+                  node-version: ${ { matrix.node_version } }
 
             # Package manager for caching dependencies
              cache: 'npm'
